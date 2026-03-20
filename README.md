@@ -20,19 +20,22 @@ where that keeps the design smaller and more predictable.
 
 ## Quickstart
 
+### Requirements
+
+- macOS
+- `uv`
+- a local config file in `~/.config/maxsize/config.toml`
+
 ### Install with `uv`
 
-Run directly from the GitHub repository:
-
-```bash
-uv tool install git+ssh://[email protected]/lxkrmr/maxsize.git
-```
-
-If you prefer HTTPS:
+Install directly from GitHub:
 
 ```bash
 uv tool install git+https://github.com/lxkrmr/maxsize.git
 ```
+
+This makes the `maxsize` command available without a global Python package
+installation.
 
 ### Create config
 
