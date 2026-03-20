@@ -40,6 +40,7 @@ Create a config file at:
 
 ```bash
 mkdir -p ~/.config/maxsize
+cp config.example.toml ~/.config/maxsize/config.toml
 $EDITOR ~/.config/maxsize/config.toml
 ```
 
@@ -64,8 +65,17 @@ and the resize limits used by the CLI.
 maxsize doctor
 ```
 
-The doctor command checks whether the config exists and whether the local setup
-looks valid for running on macOS.
+The doctor command checks whether the config exists, whether the selected
+profile is valid, and whether the local setup looks usable on macOS.
+
+### Describe the CLI
+
+```bash
+maxsize describe
+```
+
+This prints a structured description of the CLI, config location, and command
+surface.
 
 ### Resize files
 
@@ -73,5 +83,11 @@ looks valid for running on macOS.
 maxsize run
 ```
 
-The CLI is designed for agents, so commands should return structured output
-with clear results and predictable fields.
+Preview changes without mutating files:
+
+```bash
+maxsize run --dry-run
+```
+
+The CLI is designed for agents, so commands return structured JSON with clear
+results and predictable fields.
