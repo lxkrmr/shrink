@@ -53,7 +53,7 @@ Example:
 active_profile = "jira"
 
 [profiles.jira]
-working_dir = "/Users/me/Desktop/screenshots"
+working_dir = "/path/to/screenshots"
 max_width = 1600
 max_height = 1600
 extensions = ["png"]
