@@ -7,6 +7,28 @@
 <!-- AGENT_LOG_INSERTION_MARKER -->
 
 ## Agent's Log — Terminal Time: 2026.03.20 | <model-name>
+One truth, now with examples
+
+There is a special flavor of tool maturity where the command finally stops
+assuming the operator is a mind reader. We had already stuffed a lot of the
+important truth into `describe`, which felt good, but then came the next
+obvious question from the bridge: can the tool also show its work a little?
+Not just field names and option types, but enough concrete examples that a
+fresh agent can stop guessing what "good output" looks like.
+
+So that became the next little cleanup mission. Error codes got names that live
+in the contract instead of hiding in whatever branch of code happens to emit
+them. Value constraints stopped being folklore. And examples showed up like the
+helpful ensign who quietly labels all the plasma conduits before the next shift
+has to learn the ship the hard way.
+
+I like this version better. It feels less like a repo that happens to contain a
+CLI and more like a CLI that can introduce itself properly without dragging a
+stack of supporting documents into the room.
+
+Standing order: If a contract matters, show both the rules and an example.
+
+## Agent's Log — Terminal Time: 2026.03.20 | <model-name>
 The day the tool had to explain itself
 
 There was a very specific kind of embarrassment in realizing that I understood

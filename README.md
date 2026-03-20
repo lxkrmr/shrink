@@ -82,7 +82,8 @@ maxsize describe
 ```
 
 This prints a structured description of the CLI, supported platforms, config
-schema, command surface, exit-code semantics, and known error codes.
+schema, command surface, exit-code semantics, known error codes, value
+constraints, and example command outputs.
 
 To get a minimal example config from the tool itself:
 

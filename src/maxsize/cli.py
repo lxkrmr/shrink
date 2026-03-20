@@ -337,6 +337,7 @@ def describe() -> None:
         {
             "tool": "maxsize",
             "version": __version__,
+            "contractVersion": "1",
             "summary": "Resize matching images in place so they stay within configured maximum dimensions.",
             "supports": {
                 "platforms": SUPPORTED_PLATFORMS,
@@ -397,6 +398,13 @@ def describe() -> None:
                         "default": DEFAULT_EXTENSIONS,
                         "description": "Allowed file extensions without leading dots.",
                     },
+                },
+                "valueConstraints": {
+                    "profileNames": "must be non-empty strings",
+                    "workingDir": "must be a non-empty path string; ~ is expanded",
+                    "maxWidth": "must be a positive integer when provided",
+                    "maxHeight": "must be a positive integer when provided",
+                    "extensions": "must be a non-empty array of non-empty strings",
                 },
                 "constraints": {
                     "requiresAtLeastOneLimit": ["max_width", "max_height"],
@@ -534,6 +542,54 @@ def describe() -> None:
                 "INVALID_WORKING_DIR": "Returned when the configured working directory does not exist or is not a directory.",
                 "MISSING_CONFIG": "Returned by doctor when the config file does not exist.",
                 "UNSUPPORTED_PLATFORM": "Returned when the current platform is not supported.",
+            },
+            "examples": {
+                "init": {
+                    "command": "maxsize init --profile jira --working-dir /path/to/screenshots --max-width 1280 --max-height 1280",
+                    "result": {
+                        "status": "ok",
+                        "profile": "jira",
+                        "nextCommand": "maxsize doctor",
+                    },
+                },
+                "doctor": {
+                    "command": "maxsize doctor",
+                    "result": {
+                        "status": "ok",
+                        "checks": [
+                            {"name": "platform", "ok": True},
+                            {"name": "config", "ok": True},
+                        ],
+                    },
+                },
+                "runDry": {
+                    "command": "maxsize run --dry-run",
+                    "result": {
+                        "status": "ok",
+                        "dryRun": True,
+                        "images": [
+                            {
+                                "path": "/path/to/screenshots/example.png",
+                                "wouldResize": True,
+                                "target": {"width": 1280, "height": 720},
+                            }
+                        ],
+                    },
+                },
+                "run": {
+                    "command": "maxsize run",
+                    "result": {
+                        "status": "ok",
+                        "dryRun": False,
+                        "images": [
+                            {
+                                "path": "/path/to/screenshots/example.png",
+                                "resized": True,
+                                "after": {"width": 1280, "height": 720},
+                            }
+                        ],
+                    },
+                },
             },
         }
     )
