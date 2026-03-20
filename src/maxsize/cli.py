@@ -26,6 +26,7 @@ app = typer.Typer(
 
 CONFIG_DIR = Path.home() / ".config" / "maxsize"
 CONFIG_PATH = CONFIG_DIR / "config.toml"
+DEFAULT_PROFILE_NAME = "default"
 DEFAULT_EXTENSIONS = ["png"]
 
 
@@ -88,6 +89,27 @@ def load_config(config_path: Path = CONFIG_PATH) -> tuple[dict[str, Any], dict[s
         raise ConfigError("Config root must be a TOML table.")
 
     return raw, raw.get("profiles", {})
+
+
+def render_config_toml(
+    *,
+    profile: str,
+    working_dir: Path,
+    max_width: int | None,
+    max_height: int | None,
+    extensions: list[str],
+) -> str:
+    lines = [f'active_profile = "{profile}"', "", f"[profiles.{profile}]", f'working_dir = "{working_dir}"']
+
+    if max_width is not None:
+        lines.append(f"max_width = {max_width}")
+    if max_height is not None:
+        lines.append(f"max_height = {max_height}")
+
+    rendered_extensions = ", ".join(f'"{ext}"' for ext in extensions)
+    lines.append(f"extensions = [{rendered_extensions}]")
+    lines.append("")
+    return "\n".join(lines)
 
 
 def resolve_profile(config_path: Path, selected_profile: str | None) -> ProfileConfig:
@@ -208,6 +230,94 @@ def resize_in_place(path: Path, target_width: int, target_height: int) -> None:
 
 
 @app.command()
+def init(
+    profile: str = typer.Option(DEFAULT_PROFILE_NAME, help="Profile name to create."),
+    working_dir: Path = typer.Option(..., help="Working directory for images."),
+    max_width: int | None = typer.Option(None, help="Maximum allowed width in pixels."),
+    max_height: int | None = typer.Option(None, help="Maximum allowed height in pixels."),
+    extensions: list[str] | None = typer.Option(None, help="Allowed file extensions. Repeat the option to add more values."),
+    force: bool = typer.Option(False, help="Overwrite an existing config file."),
+) -> None:
+    try:
+        validated_max_width = validate_limit("max_width", max_width)
+        validated_max_height = validate_limit("max_height", max_height)
+        if validated_max_width is None and validated_max_height is None:
+            raise ConfigError("At least one of --max-width or --max-height must be provided.")
+
+        normalized_extensions = normalize_extensions(extensions)
+        normalized_working_dir = working_dir.expanduser()
+        if not str(profile).strip():
+            raise ConfigError("Profile name must be a non-empty string.")
+        if not str(normalized_working_dir).strip():
+            raise ConfigError("Working directory must be a non-empty path.")
+    except ConfigError as exc:
+        emit_json(
+            {
+                "tool": "maxsize",
+                "version": __version__,
+                "command": "init",
+                "status": "error",
+                "profile": profile,
+                "configPath": str(CONFIG_PATH),
+                "errors": [{"code": "INVALID_INIT_OPTIONS", "message": str(exc)}],
+            },
+            exit_code=1,
+        )
+
+    if CONFIG_PATH.exists() and not force:
+        emit_json(
+            {
+                "tool": "maxsize",
+                "version": __version__,
+                "command": "init",
+                "status": "error",
+                "profile": profile,
+                "configPath": str(CONFIG_PATH),
+                "errors": [
+                    {
+                        "code": "CONFIG_ALREADY_EXISTS",
+                        "message": f"Config file already exists: {CONFIG_PATH}",
+                    }
+                ],
+            },
+            exit_code=1,
+        )
+
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    CONFIG_PATH.write_text(
+        render_config_toml(
+            profile=profile,
+            working_dir=normalized_working_dir,
+            max_width=validated_max_width,
+            max_height=validated_max_height,
+            extensions=normalized_extensions,
+        )
+    )
+
+    emit_json(
+        {
+            "tool": "maxsize",
+            "version": __version__,
+            "command": "init",
+            "status": "ok",
+            "profile": profile,
+            "configPath": str(CONFIG_PATH),
+            "createdConfigDir": str(CONFIG_DIR),
+            "overwroteExistingConfig": force,
+            "config": {
+                "activeProfile": profile,
+                "workingDir": str(normalized_working_dir),
+                "maxWidth": validated_max_width,
+                "maxHeight": validated_max_height,
+                "extensions": normalized_extensions,
+            },
+            "nextCommand": "maxsize doctor",
+            "errors": [],
+        }
+    )
+
+
+@app.command()
 def describe() -> None:
     emit_json(
         {
@@ -220,6 +330,18 @@ def describe() -> None:
                 "supportsProfiles": True,
             },
             "commands": {
+                "init": {
+                    "mutatesFiles": True,
+                    "summary": "Create an initial config file for a profile.",
+                    "options": {
+                        "profile": "Profile name to create.",
+                        "workingDir": "Working directory for matching images.",
+                        "maxWidth": "Optional maximum width in pixels.",
+                        "maxHeight": "Optional maximum height in pixels.",
+                        "extensions": "Allowed file extensions.",
+                        "force": "Overwrite an existing config file.",
+                    },
+                },
                 "describe": {
                     "mutatesFiles": False,
                     "summary": "Describe the CLI, config, and output model.",
@@ -257,6 +379,7 @@ def doctor(
     errors: list[dict[str, str]] = []
     checks: list[dict[str, Any]] = []
     resolved_profile: ProfileConfig | None = None
+    next_command: str | None = None
 
     is_macos = sys.platform == "darwin"
     checks.append({"name": "platform", "ok": is_macos, "expected": "darwin", "actual": sys.platform})
@@ -272,6 +395,7 @@ def doctor(
     checks.append({"name": "config", "ok": config_exists, "path": str(CONFIG_PATH)})
     if not config_exists:
         errors.append({"code": "MISSING_CONFIG", "message": f"Config file not found: {CONFIG_PATH}"})
+        next_command = "maxsize init --working-dir /path/to/screenshots --max-width 1600 --max-height 1600"
     else:
         try:
             resolved_profile = resolve_profile(CONFIG_PATH, profile)
@@ -313,6 +437,7 @@ def doctor(
             "profile": resolved_profile.name if resolved_profile else profile,
             "configPath": str(CONFIG_PATH),
             "checks": checks,
+            "nextCommand": next_command,
             "errors": errors,
         },
         exit_code=0 if not errors else 1,

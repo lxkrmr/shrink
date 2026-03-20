@@ -24,7 +24,6 @@ where that keeps the design smaller and more predictable.
 
 - macOS
 - `uv`
-- a local config file in `~/.config/maxsize/config.toml`
 
 ### Install with `uv`
 
@@ -39,15 +38,15 @@ installation.
 
 ### Create config
 
-Create a config file at:
+Initialize a config file with a profile:
 
 ```bash
-mkdir -p ~/.config/maxsize
-cp config.example.toml ~/.config/maxsize/config.toml
-$EDITOR ~/.config/maxsize/config.toml
+maxsize init --profile jira --working-dir /path/to/screenshots --max-width 1600 --max-height 1600
 ```
 
-Example:
+This creates `~/.config/maxsize/config.toml`.
+
+Example result:
 
 ```toml
 active_profile = "jira"
@@ -62,6 +61,9 @@ extensions = ["png"]
 The config supports multiple profiles. A profile defines the working directory
 and the resize limits used by the CLI.
 
+If you prefer to start from an example file instead, copy
+`config.example.toml` to `~/.config/maxsize/config.toml` and edit it.
+
 ### Verify local setup
 
 ```bash
@@ -69,7 +71,8 @@ maxsize doctor
 ```
 
 The doctor command checks whether the config exists, whether the selected
-profile is valid, and whether the local setup looks usable on macOS.
+profile is valid, and whether the local setup looks usable on macOS. If no
+config exists yet, it returns a suggested `nextCommand` for `maxsize init`.
 
 ### Describe the CLI
 
@@ -94,3 +97,7 @@ maxsize run --dry-run
 
 The CLI is designed for agents, so commands return structured JSON with clear
 results and predictable fields.
+
+## License
+
+MIT
