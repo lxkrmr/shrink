@@ -499,6 +499,14 @@ def describe() -> None:
                     "status": "ok | error",
                     "errors": "array[object]",
                 },
+                "init": {
+                    "profile": "string",
+                    "configPath": "string",
+                    "createdConfigDir": "string",
+                    "overwroteExistingConfig": "boolean",
+                    "config": "object",
+                    "nextCommand": "string",
+                },
                 "doctor": {
                     "profile": "string | null",
                     "configPath": "string",
@@ -517,6 +525,15 @@ def describe() -> None:
                     "format": "toml",
                     "example": "string",
                 },
+            },
+            "errorCodes": {
+                "CONFIG_ALREADY_EXISTS": "Returned by init when a config file already exists and --force is not used.",
+                "IMAGE_PROCESSING_FAILED": "Returned by run when an image cannot be inspected or resized.",
+                "INVALID_CONFIG": "Returned when config loading, parsing, or profile resolution fails.",
+                "INVALID_INIT_OPTIONS": "Returned by init when the provided options do not form a valid config.",
+                "INVALID_WORKING_DIR": "Returned when the configured working directory does not exist or is not a directory.",
+                "MISSING_CONFIG": "Returned by doctor when the config file does not exist.",
+                "UNSUPPORTED_PLATFORM": "Returned when the current platform is not supported.",
             },
         }
     )
