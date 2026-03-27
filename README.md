@@ -1,111 +1,60 @@
 # maxsize
 
-`maxsize` is an agent-friendly CLI for resizing screenshots and other images
-to configured maximum dimensions.
+Resize images in a directory so they fit within a maximum width and height.
+Aspect ratio is always preserved. Files already within the limits are left
+untouched.
 
-## Why
+## Install
 
-Modern dev workflows create huge screenshots, especially on 4K displays. That
-is great for detail and terrible for tickets, QA handoffs, and everyday file
-sharing.
-
-`maxsize` exists to keep that workflow simple:
-- save screenshots to a working directory
-- define one or more profiles in config
-- resize images that exceed a configured max width and/or max height
-- return structured, machine-readable results that work well for agents
-
-The tool uses a small Python-based image processing stack to keep the design
-predictable and easy to install with `uv` on macOS and Linux.
-
-## Quickstart
-
-### Requirements
-
-- macOS or Linux
-- `uv`
-
-### Install with `uv`
-
-Install directly from GitHub:
-
-```bash
-uv tool install git+https://github.com/lxkrmr/maxsize.git
+```sh
+go install github.com/maxsize/maxsize@latest
 ```
 
-This makes the `maxsize` command available without a global Python package
-installation.
+Requires Go. The binary lands in `~/go/bin/maxsize`, which should already be
+in your `$PATH` if you have used `go install` before.
 
-### Create config
+## Usage
 
-Initialize a config file with a profile:
-
-```bash
-maxsize init --profile jira --working-dir /path/to/screenshots --max-width 1600 --max-height 1600
+```sh
+maxsize <dir> --max-width N --max-height N
 ```
 
-This creates `~/.config/maxsize/config.toml`.
+At least one of `--max-width` or `--max-height` is required.
 
-Example result:
+```sh
+# resize everything in ~/Screenshots to fit within 1280×1280
+maxsize ~/Screenshots --max-width 1280 --max-height 1280
 
-```toml
-active_profile = "jira"
-
-[profiles.jira]
-working_dir = "/path/to/screenshots"
-max_width = 1600
-max_height = 1600
-extensions = ["png"]
+# current directory, only constrain width
+maxsize . --max-width 1920
 ```
 
-The config supports multiple profiles. A profile defines the working directory
-and the resize limits used by the CLI.
+Shell alias example:
 
-If you prefer to start from an example file instead, copy
-`config.example.toml` to `~/.config/maxsize/config.toml` and edit it.
-
-### Verify local setup
-
-```bash
-maxsize doctor
+```sh
+alias shrink='maxsize ~/Screenshots --max-width 1280 --max-height 1280'
 ```
 
-The doctor command checks whether the config exists, whether the selected
-profile is valid, and whether the local setup looks usable on supported
-platforms. If no config exists yet, it returns a suggested `nextCommand` for
-`maxsize init`.
+## Output
 
-### Describe the CLI
+```
+screenshot-big.png: 3200×2400 → 1280×960 (4.2 MB → 0.9 MB)
+screenshot-ok.png: ok (1024×768)
 
-```bash
-maxsize describe
+2 resized, 1 ok, 0 failed
 ```
 
-This prints a structured description of the CLI, supported platforms, config
-schema, command surface, exit-code semantics, known error codes, value
-constraints, and example command outputs.
+Errors go to stderr. Exit code is `0` if all files were processed, `1` if any
+file failed.
 
-To get a minimal example config from the tool itself:
+## Supported formats
 
-```bash
-maxsize config-example
-```
+PNG, JPEG. Files with other extensions are silently skipped.
 
-### Resize files
+## Flags
 
-```bash
-maxsize run
-```
-
-Preview changes without mutating files:
-
-```bash
-maxsize run --dry-run
-```
-
-The CLI is designed for agents, so commands return structured JSON with clear
-results and predictable fields.
-
-## License
-
-MIT
+| Flag | Description |
+|---|---|
+| `--max-width N` | Maximum width in pixels |
+| `--max-height N` | Maximum height in pixels |
+| `--version` | Print version and exit |
