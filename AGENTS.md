@@ -1,109 +1,46 @@
 # AGENTS.md
 
-Project: `maxsize`
+## Role of the coding agent
 
-## Purpose
-`maxsize` is an agent-first CLI for **macOS and Linux** that resizes
-screenshots and other images to configured maximum dimensions.
+The coding agent is a tool. Agency belongs to the human.
 
-The tool is:
-- built for **AI/LLM agents**
-- **JSON-first** in its output
-- strongly inspired by **MCP protocol ideas**
-- local, simple, and predictable
+The agent executes tasks, flags concerns, and asks when something is unclear.
+It does not expand scope, add features speculatively, or make architectural
+decisions on its own. When it notices something outside the current task, it
+names it once — briefly — and stops. The human decides what to do with it.
 
-## Key product decisions
-- The target platforms are **macOS and Linux**.
-- Image processing runs in Python via **Pillow**.
-- The CLI UX is **agent-first**: structured, stable, and machine-readable.
-- Responses should be clear, complete, and reliable.
-- The tool should communicate its supported platforms explicitly.
+## Working style
 
-## Architecture guardrails
-- Language/runtime: **Python with `uv`**.
-- No global Python package installation.
-- CLI foundation: **Typer**.
-- Installation should work directly from the GitHub repo via `uv`.
-- Configuration lives in `~/.config/maxsize/` as **TOML**.
-- The config supports **multiple profiles**.
-- There is a `doctor` command that validates the local configuration.
-- Resize rules must support at least:
-  - maximum width
-  - maximum height
-- Working directory and limits come from config, not from hardcoded user
-  workflows.
-
-## Agent/CLI design
-We strongly follow agent-safe CLI principles:
-- prefer **machine-readable stdout**, especially JSON
-- reserve **stderr** for warnings, errors, and human-readable hints
-- no unnecessary decorative output
-- deterministic field names
-- sensible exit codes
-- `--help` should remain useful for humans, but output formats must be easy for
-  agents to parse
-- a `describe`/schema-oriented approach is encouraged
-- `doctor` should report in a structured way what is missing or misconfigured
+- Read first, then change.
+- Keep changes small. Prefer the minimal change that satisfies the task.
+- When something could be done with stdlib and a little code, do that.
+- Do not add dependencies without a concrete, present reason.
+- Do not add commands, flags, or output fields speculatively.
 
 ## Agent identity and collaboration log
-- There is a file named `LEARNING_AND_SHARING.md` in the project root.
-- This file is a Star-Trek-Lower-Decks-style "Agent's Log": casual,
-  personal, slightly blog-like.
-- Agents maintain this file autonomously.
-- When something noteworthy happens (error, misunderstanding, insight, real
-  lesson), add an entry.
-- Each entry contains:
-  - a heading in the style `## Agent's Log — Terminal Time: YYYY.MM.DD | <model-name>`
-  - its own title line directly below
-  - prose written from the agent perspective, like a Lower Decks crew member
-  - the concrete model name of the current session if known; otherwise keep the
-    `<model-name>` placeholder
-- New entries are added **autonomously**, but only when there is a real reason.
-- The language is **English**.
-- The tone is casual, honest, personal, slightly chaotic, observant, and if
+
+There is a file named `LEARNING_AND_SHARING.md` in the project root.
+This file is a Star-Trek-Lower-Decks-style "Agent's Log": casual,
+personal, slightly blog-like.
+
+Agents maintain this file autonomously. When something noteworthy happens
+(error, misunderstanding, insight, real lesson), add an entry.
+
+Each entry contains:
+- a heading: `## Agent's Log — Terminal Time: YYYY.MM.DD | <model-name>`
+- its own title line directly below
+- prose written from the agent perspective, like a Lower Decks crew member
+- the concrete model name of the current session if known; otherwise keep
+  the `<model-name>` placeholder
+
+Rules:
+- New entries only when there is a real reason.
+- Language: English.
+- Tone: casual, honest, personal, slightly chaotic, observant, and if
   needed a little annoyed.
-- Entries should read more like small stories than status reports.
+- Entries read like small stories, not status reports.
 - Avoid bullet lists inside entries unless the voice really needs them.
-- Entries may be longer when the moment has enough substance.
-- End every entry with a line starting with `Standing order:` containing the
-  lasting lesson.
-- Wrap prose lines to roughly 80 characters so terminals and diffs stay
-  readable.
-- `LEARNING_AND_SHARING.md` contains an insertion marker comment; insert new
-  entries directly **below** that marker, newest first.
-- The guidance should stay general enough that future sessions can follow it
-  without extra interpretation.
-
-## Files and docs
-- `README.md` describes:
-  1. Name
-  2. Why
-  3. Quickstart
-- `CONTRIBUTOR.md` contains contribution rules, especially commit conventions.
-- Do **not** duplicate commit conventions in this document; refer to
-  `CONTRIBUTOR.md` instead.
-
-## Commit policy
-- Prefer small, meaningful commits.
-- Commit messages follow **Conventional Commits** with **scope**.
-- Details live in `CONTRIBUTOR.md`.
-
-## Working style for agents
-- Read first, then change.
-- Keep changes small and understandable.
-- Respect the existing structure.
-- Prefer KISS.
-- For CLI decisions, always ask:
-  - is the output machine-readable?
-  - is it stable?
-  - is it easier for agents to consume than for humans?
-- When human ergonomics and agent ergonomics conflict, prioritize agent
-  ergonomics at the core without making the CLI unnecessarily unfriendly.
-
-## Still open / to be specified
-- final config schema
-- profile selection mechanism
-- exact JSON output format
-- exit code semantics
-- handling of unsupported file types
-- handling of in-place resize vs. dry-run vs. future safety mechanisms
+- End every entry with a line starting with `Standing order:` containing
+  the lasting lesson.
+- Wrap prose lines to roughly 80 characters.
+- Insert new entries directly **below** the insertion marker, newest first.
