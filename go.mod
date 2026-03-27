@@ -1,4 +1,4 @@
-module github.com/maxsize/maxsize
+module github.com/lxkrmr/maxsize
 
 go 1.23.0
 

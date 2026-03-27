@@ -7,7 +7,7 @@ untouched.
 ## Install
 
 ```sh
-go install github.com/maxsize/maxsize@latest
+go install github.com/lxkrmr/maxsize@latest
 ```
 
 Requires Go. The binary lands in `~/go/bin/maxsize`, which should already be
