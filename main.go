@@ -163,7 +163,7 @@ func main() {
 	flag.IntVar(&maxHeight, "max-height", 0, "maximum height in pixels")
 	flag.BoolVar(&showVersion, "version", false, "print version and exit")
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "maxsize %s\n\nUsage: maxsize <dir> --max-width N --max-height N\n\n", version)
+		fmt.Fprintf(os.Stderr, "maxsize %s\n\nUsage: maxsize --max-width N --max-height N <dir>\n\n", version)
 		flag.PrintDefaults()
 	}
 	flag.Parse()

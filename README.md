@@ -16,23 +16,23 @@ in your `$PATH` if you have used `go install` before.
 ## Usage
 
 ```sh
-maxsize <dir> --max-width N --max-height N
+maxsize --max-width N --max-height N <dir>
 ```
 
-At least one of `--max-width` or `--max-height` is required.
+At least one of `--max-width` or `--max-height` is required. Flags must come before the directory.
 
 ```sh
 # resize everything in ~/Screenshots to fit within 1280×1280
-maxsize ~/Screenshots --max-width 1280 --max-height 1280
+maxsize --max-width 1280 --max-height 1280 ~/Screenshots
 
 # current directory, only constrain width
-maxsize . --max-width 1920
+maxsize --max-width 1920 .
 ```
 
 Shell alias example:
 
 ```sh
-alias shrink='maxsize ~/Screenshots --max-width 1280 --max-height 1280'
+alias shrink='maxsize --max-width 1280 --max-height 1280 ~/Screenshots'
 ```
 
 ## Output
